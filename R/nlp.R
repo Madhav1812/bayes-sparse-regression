@@ -40,7 +40,7 @@ SpSlNLP <- function(y,X,phi,
         z.cut <- z[z>0]
         phis <- phi[z.cut]
         y.null <- y[z==0]
-        log.prob <- log(Pi[1])+LA(Xz,y,phis,sigma2,p)$la-0.5*sigma2^{-1}*(sum(y.null^2))
+        log.prob <- log(Pi[1])+LA(Xz,y,phis,sigma2,p)$la
       }
 
       for(k in 1:K) {
@@ -49,7 +49,7 @@ SpSlNLP <- function(y,X,phi,
         z.cut <- z[z>0]
         phis <- phi[z.cut]
         y.null <- y[z==0]
-        log.prob[k+1] <- log(Pi[k+1])+LA(Xz,y,phis,sigma2,p)$la-0.5*sigma2^{-1}*(sum(y.null^2))
+        log.prob[k+1] <- log(Pi[k+1])+LA(Xz,y,phis,sigma2,p)$la
       }
 
       log.prob <- log.prob - max(log.prob)
@@ -88,9 +88,9 @@ SpSlNLP <- function(y,X,phi,
 
 LA <- function(Xz,y,phis,sigma2,p) {
   pt <- ncol(Xz)
-  la <- (pt/2)*log(2)
+  la <- pt*sqrt(2)
   la <- la - (p/2)*log(2*pi*sigma2)
-  la <- la + (pt/2)*2*pi
+  la <- la + (pt/2)*log(2*pi)
 
   val <- LA.maximizer(Xz,y,phis,sigma2)
   beta.star <- val$beta
@@ -99,7 +99,7 @@ LA <- function(Xz,y,phis,sigma2,p) {
   f <- -1/(2*sigma2)*t(y-Xz%*%beta.star)%*%(y-Xz%*%beta.star)
   f <- f-sum(phis/(beta.star^2))-sum(beta.star^2/(2*phis))
   f <- as.vector(f)
-  la <- la + 1/det(H) + f
+  la <- la + 0.5*log(1/det(H)) + f
   val <- list()
   val$la <- la
   val$beta.star <- beta.star
